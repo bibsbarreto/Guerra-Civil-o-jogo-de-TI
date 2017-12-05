@@ -2,55 +2,24 @@ package br.ufms.facom.lpoo.rpg.personagem;
 import br.ufms.facom.lpoo.rpg.arma.Arma;
 import br.ufms.facom.lpoo.rpg.arma.Armamento;
 
-/**
- * Personagem soldado.
- * <p>
- * Este é apenas um exemplo que não respeita os requisitos do trabalho.
- * 
- * @author eraldo
- *
- */
 public class Soldado implements Personagem {
 
-	/**
-	 * Arma do soldado.
-	 */
 	private Arma arma;
-
-	/**
-	 * Nível de vida do soldado.
-	 */
 	private int vida;
-
-	/**
-	 * Nome do soldado.
-	 */
 	private String nome;
-
-	/**
-	 * Posição do soldado no tabuleiro.
-	 */
 	private Posicao posicao;
+	
+	//Atributos
+	private int ataque;
+	private int defesa;
+	private int velocidade;
 
-	/**
-	 * Cria um soldado com o nome dado.
-	 * 
-	 * @param nome
-	 */
 	public Soldado(String nome) {
 		this.nome = nome;
-		//arma = new Armamento(nomeDaArma, alcance);
 		vida = 5;
 		posicao = new Posicao();
 	}
 
-	/**
-	 * Cria um soldado com o nome e posição dados.
-	 * 
-	 * @param nome
-	 * @param x
-	 * @param y
-	 */
 	public Soldado(String nome, String nomeDaArma, int alcance, int x, int y) {
 		this(nome);
 		arma = new Armamento(nomeDaArma, alcance);
@@ -58,18 +27,25 @@ public class Soldado implements Personagem {
 	}
 
 	@Override
+	public void setAtributos(int ataque, int defesa, int velocidade) {
+		this.defesa = defesa;
+		this.ataque = ataque;
+		this.velocidade = velocidade;
+	}
+	
+	@Override
 	public int getDefesa() {
-		return 0;
+		return defesa;
 	}
 
 	@Override
 	public int getAtaque() {
-		return 0;
+		return ataque;
 	}
 
 	@Override
 	public int getVelocidade() {
-		return 0;
+		return velocidade;
 	}
 
 	@Override

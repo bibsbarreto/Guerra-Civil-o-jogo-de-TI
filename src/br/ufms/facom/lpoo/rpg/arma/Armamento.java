@@ -1,14 +1,5 @@
 package br.ufms.facom.lpoo.rpg.arma;
 
-/**
- * Implementa uma arma: faca.
- * <p>
- * Esta implementação é apenas um exemplo que não segue as especificações do
- * trabalho.
- * 
- * @author eraldo
- *
- */
 public class Armamento implements Arma {
         
 	public String nome;
@@ -20,7 +11,7 @@ public class Armamento implements Arma {
     }
     
     @Override
-    public void setAlcance() {
+    public void setAlcance(int alcance) {
     	this.alcance = alcance;
     }
         
@@ -30,7 +21,7 @@ public class Armamento implements Arma {
 	}
         
     @Override
-    public void setNome() {
+    public void setNome(String nome) {
         this.nome = nome;
     }
 
@@ -38,5 +29,15 @@ public class Armamento implements Arma {
     public String getNome() {
         return nome;
     }
+
+	@Override
+	public void setAlcance() {
+
+	}
+
+	@Override
+	public void setNome() {	
+		
+	}
 
 }

@@ -43,41 +43,18 @@ public class RolePlayingGame extends Application {
 
 	private SelecaoTabuleiro selecao;
 
-	/**
-	 * Largura, em pixels, do tabuleiro (canvas).
-	 */
 	private static final int W = 768;
 
-	/**
-	 * Altura, em pixels, do tabuleiro (canvas).
-	 */
 	private static final int H = 768;
 
-	/**
-	 * Largura, em casas, do tabuleiro.
-	 */
 	public static final int MAX_X = 8;
 
-	/**
-	 * Altura, em casas, do tabuleiro.
-	 */
 	public static final int MAX_Y = 8;
 
-	/**
-	 * Largura, em pixels, de uma casa do tabuleiro.
-	 */
 	private static final int CELL_W = W / MAX_X;
 
-	/**
-	 * Altura, em pixels, de uma casa do tabuleiro.
-	 */
 	private static final int CELL_H = H / MAX_Y;
 
-	/**
-	 * Ponto de entrada da aplicaÃ§Ã£o.
-	 * 
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -184,9 +161,11 @@ public class RolePlayingGame extends Application {
 			double x = p.getX() * CELL_W;
 			double y = p.getY() * CELL_H;
 			// Desenha ícone do personagem.
-			gc.drawImage(getIcon(p, p.getNome()), x, y);
-			// Desenha ícone da arma.
-			gc.drawImage(getIcon(p.getArma(), p.getArma().getNome()), x + 72, y + 72);
+			gc.drawImage(getIcon(p.getNome()), x, y);
+			// Desenha ícone da arma à distância
+			gc.drawImage(getIcon(p.getArma().getNome()), x + 45, y + 72);
+			//Desenha ícone da arma corpo a corpo
+			gc.drawImage(getIcon("Pen drive com vírus"), x + 70, y + 72);
 			// Desenha nome do personagem.
 			gc.setStroke(Color.BLUE);
 			gc.strokeText(p.getNome(), x, y + 90);
@@ -209,8 +188,7 @@ public class RolePlayingGame extends Application {
 	}
 
 
-	private Image getIcon(Object o, String nome) {
-		String className = o.getClass().getSimpleName();
+	private Image getIcon(String nome) {
 		Image icon = icons.get(nome);
 		if (icon == null) {
 			icon = new Image("/icons/" + nome + ".png");
@@ -297,7 +275,7 @@ public class RolePlayingGame extends Application {
 		paneBotoes.getChildren().add(btnSair);
 
 		// Configura Stage e o exibe.
-		primaryStage.setTitle("Role Playing Game");
+		primaryStage.setTitle("Guerra Civil, o jogo de TI");
 		Scene scene = new Scene(grid, 1024, 768);
 		primaryStage.setScene(scene);
 		primaryStage.show();
