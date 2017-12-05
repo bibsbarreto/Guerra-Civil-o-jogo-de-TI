@@ -26,61 +26,21 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-/**
- * Interface do RPG.
- * <p>
- * Implementa a exibição do tabuleiro (casas e personagens com suas armas,
- * níveis de vida, nomes), exibição das mensagens e entradas do usuário (seleção
- * de posição e seleção de personagem).
- * 
- * @author eraldo
- *
- */
+
 public class RolePlayingGame extends Application {
-	/**
-	 * Canvas que exibe o tabuleiro.
-	 */
+
 	private Canvas canvas;
 
-	/**
-	 * Lista de mensagens. Cada mensagem é um par (String,Boolean). O valor
-	 * booleano indica se a mensagem é de erro ou não.
-	 */
 	private ObservableList<Pair<String, Boolean>> mensagens;
 
-	/**
-	 * Armazena os ícones dos personagens adicionados ao tabuleiro.
-	 */
 	private Map<String, Image> icons;
 
-	/**
-	 * Lista de personagens no tabuleiro.
-	 */
 	private List<Personagem> personagens;
 
-	/**
-	 * Objeto de controle do jogo.
-	 */
 	private Controle controle;
 
-	/**
-	 * Thread que executa o controle do jogo.
-	 */
 	private Thread threadControle;
 
-	/**
-	 * Objeto usado na sincronização da entrada do usuário (seleção de posição e
-	 * de personagem com o mouse).
-	 * <p>
-	 * O procedimento de entrada é implementado como um produtor-consumidor. A
-	 * thread de controle é o consumidor (de posições e de personagens). A
-	 * interface (thread da aplicação) é o produtor. Entretanto, a produção é
-	 * solicitada pelo consumidor (controle). Somente após o controle solicitar
-	 * uma entrada (posição ou personagem) é que a entrada é produzida. Quando a
-	 * entrada é solicitada pelo controle, a thread de controle é bloqueada e a
-	 * interface aguarda o usuário fazer a seleção adequada. Assim que o usuário
-	 * seleciona a entrada esperada, a interface a fornece à thread de controle.
-	 */
 	private SelecaoTabuleiro selecao;
 
 	/**
