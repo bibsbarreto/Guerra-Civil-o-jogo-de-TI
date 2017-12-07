@@ -2,6 +2,8 @@ package br.ufms.facom.lpoo.rpg.controle;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+
 import br.ufms.facom.lpoo.rpg.personagem.Personagem;
 import br.ufms.facom.lpoo.rpg.personagem.Posicao;
 import br.ufms.facom.lpoo.rpg.personagem.Soldado;
@@ -11,6 +13,12 @@ public class Controle {
 
 	private RolePlayingGame rpg;
 	private Thread threadControle;
+
+	//Array para valor da posição do inimigo 
+	private static int MIN = 1;
+	private static int MAX = 2;
+	int aux[] = {0, 1, -1};
+	int d;
 	
 	private List<Soldado> soldados = new LinkedList<Soldado>();
 	int ali=0, ini=0;
@@ -21,16 +29,16 @@ public class Controle {
 		// Cria personagens em um canto do tabuleiro e outro em outro canto.
 		soldados.add(new Soldado("Nokia", "Tijolão", 5, RolePlayingGame.MAX_X - 5, RolePlayingGame.MAX_Y - 2));
 		soldados.get(0).setAtributos(4, 5, 0, 0);
-		soldados.add(new Soldado("Linkedin", "Currículo", 2, RolePlayingGame.MAX_X - 3, RolePlayingGame.MAX_Y - 2));
-		soldados.get(1).setAtributos(2, 2, 5, 0);
 		soldados.add(new Soldado("Siri", "Siri Robótico", 2, 3, 1));
-		soldados.get(2).setAtributos(3, 1, 5, 1);
+		soldados.get(1).setAtributos(3, 1, 5, 1);
+		soldados.add(new Soldado("Linkedin", "Currículo", 2, RolePlayingGame.MAX_X - 3, RolePlayingGame.MAX_Y - 2));
+		soldados.get(2).setAtributos(2, 2, 5, 0);
 		soldados.add(new Soldado("Beats", "Super Bass", 3, 5, 1));
 		soldados.get(3).setAtributos(2, 3, 4, 1);
-		soldados.add(new Soldado("Steve", "Apple", 5, 4, 0));
-		soldados.get(4).setAtributos(2, 5, 2, 1);
 		soldados.add(new Soldado("Bill", "Microsoft", 3, RolePlayingGame.MAX_X - 4, RolePlayingGame.MAX_Y - 1));
-		soldados.get(5).setAtributos(5, 1, 3, 0);
+		soldados.get(4).setAtributos(5, 1, 3, 0);
+		soldados.add(new Soldado("Steve", "Apple", 5, 4, 0));
+		soldados.get(5).setAtributos(2, 5, 2, 1);
            
 		
 		// Adiciona os personagens ao tabuleiro.
@@ -47,12 +55,15 @@ public class Controle {
 		Posicao pos;
 		Personagem p;
 		
-		for (Soldado s : soldados) {
-			
-			if(s.getNome().equals("Bill") || s.getNome().equals("Nokia") || s.getNome().equals("Linkedin")) {
+		//Variável auxiliar para analisar os aliados
+		Soldado sAux = new Soldado("Nokia", "Tijolão", 5, 5000, 5000);
+		sAux.setAtributos(4, 5, 0, 0);
+		int dist[] = new int[3];
+		
+		for (Soldado s : soldados) {	
+			//Vez dos aliados
+			if(s.getTipo() == 0) {
 				rpg.info(String.format("Personagem %s, selecione sua nova posição!", s.getNome()));
-				
-			
 				
 				pos = rpg.selecionaPosicao();
 								
@@ -94,18 +105,12 @@ public class Controle {
 							rpg.atualizaTabuleiro();
 							
 							if(ini==3){
-								rpg.erro("Voce venceu!!!");
+								rpg.erro("Você venceu!!!");
 								threadControle.interrupt();
-								
+							} else
+								rpg.info(String.format("Nova rodada iniciada!"));
+							return;
 							}
-							
-							break;
-							
-							//CONTADOR DE MORTES
-							
-							
-							
-						}
 						}
 					} else {
 						rpg.erro("Você não pode atacar você mesmo! Perdeu a vez.");
@@ -113,7 +118,65 @@ public class Controle {
 					rpg.atualizaTabuleiro();
 				 }else {
 					rpg.erro("Posição inválida! Perdeu a vez.");
-			}
+				 }
+			
+				
+			//Vez dos inimigos
+			} else {
+				rpg.info(String.format("Vez do %s!", s.getNome()));
+				rpg.atualizaTabuleiro();
+				
+				//Analisar aliados mais próximos
+				int i = 0;
+				for (Soldado a : soldados) {
+					//Pegar aliado com menor distância
+					if(a.getTipo() == 0) {
+						dist[i] = Math.abs(a.getX() - s.getX()) + Math.abs(a.getY() - s.getY());
+						if(i >0) {
+							if(dist[i] < dist[i-1]) {
+								sAux = a;
+							}
+						} else {
+							sAux = a;
+						}
+					}		
+				}
+				
+				//Inimigo mover para perto do aliado
+				Random rand = new Random();
+				d = rand.nextInt(s.getVelocidade());
+				//d = Math.abs(sAux.getX() - s.getX()) + Math.abs(sAux.getY() - s.getY());
+				s.setX(rand.nextInt(d));
+				System.out.println(rand.nextInt((int)((Math.random()*MAX)+MIN)));
+				s.setY(aux[rand.nextInt((int)((Math.random()*MAX)+MIN))]*(d + sAux.getX() - s.getX()));
+				
+				//Arma de corpo a corpo - 100% de chance
+				if(Math.abs(sAux.getX() - s.getX()) == 1 || Math.abs(sAux.getY() - s.getY()) == 1) {
+					sAux.setVida(sAux.getVida() - 1);}
+				//Arma à distância
+				else if(calculaProbabilidadeDeAtaque(s, sAux)) {
+					sAux.setVida(sAux.getVida() - 1);}
+				//Ataque de arma à distância falhou
+				else {
+					rpg.erro("Nada aconteceu.");}
+						
+				//Se o inimigo morrer, ele será removido
+				if(sAux.getVida() == 0) {
+					rpg.erro("Boom! " + sAux.getNome() + " morreu! Muahahahahaahah");
+					rpg.removePersonagem(sAux);
+					soldados.remove(sAux);
+					ini++;
+					rpg.atualizaTabuleiro();
+							
+					if(ini==3){
+						rpg.erro("Você venceu!!!");
+						threadControle.interrupt();
+					} else
+						rpg.info(String.format("Nova rodada iniciada!"));
+					return;
+					}
+
+				rpg.atualizaTabuleiro();
 			}
 		}
 	}
@@ -121,7 +184,7 @@ public class Controle {
 	public boolean verificaPosicaoValida(Posicao pos, Personagem p) {
 		boolean valido = true;
 
-		if(Math.abs(p.getX() - pos.x) > 1 || Math.abs(p.getY() - pos.y) > 1) {
+		if(Math.abs(p.getX() - pos.x) + Math.abs(p.getY() - pos.y) > p.getVelocidade()) {
 			valido = false;
 		}
 		
@@ -133,14 +196,10 @@ public class Controle {
 	}
 	
 	public boolean calculaProbabilidadeDeAtaque(Personagem aliado, Personagem inimigo) {	
-		int d = Math.abs(aliado.getX() - inimigo.getX()) + Math.abs(aliado.getY() - inimigo.getY());
+		d = Math.abs(aliado.getX() - inimigo.getX()) + Math.abs(aliado.getY() - inimigo.getY());
 		
-		double mAliado = (aliado.getAtaque()*10 + aliado.getDefesa()*1 + d*1);
-		System.out.println(mAliado);
-		double mInimigo = (inimigo.getAtaque()*1 + inimigo.getDefesa()*4 + d*7);
-		System.out.println(mInimigo);
-		
-		if(mAliado >= mInimigo)
+		//Ataque só será efetivo se estiver no alcance da arma e se for maior que a defesa do inimigo
+		if(d <= aliado.getArma().getAlcance() && aliado.getAtaque() > inimigo.getDefesa())
 			return true;
 		else 
 			return false;
