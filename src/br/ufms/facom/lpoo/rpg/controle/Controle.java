@@ -10,25 +10,27 @@ import br.ufms.facom.lpoo.rpg.ui.RolePlayingGame;
 public class Controle {
 
 	private RolePlayingGame rpg;
+	private Thread threadControle;
+	
 	private List<Soldado> soldados = new LinkedList<Soldado>();
-
+	int ali=0, ini=0;
 
 	public Controle(RolePlayingGame rpg) {
 		this.rpg = rpg;
 
 		// Cria personagens em um canto do tabuleiro e outro em outro canto.
 		soldados.add(new Soldado("Nokia", "Tijolão", 5, RolePlayingGame.MAX_X - 5, RolePlayingGame.MAX_Y - 2));
-		soldados.get(0).setAtributos(4, 5, 0);
+		soldados.get(0).setAtributos(4, 5, 0, 0);
 		soldados.add(new Soldado("Linkedin", "Currículo", 2, RolePlayingGame.MAX_X - 3, RolePlayingGame.MAX_Y - 2));
-		soldados.get(1).setAtributos(2, 2, 5);
+		soldados.get(1).setAtributos(2, 2, 5, 0);
 		soldados.add(new Soldado("Siri", "Siri Robótico", 2, 3, 1));
-		soldados.get(2).setAtributos(3, 1, 5);
+		soldados.get(2).setAtributos(3, 1, 5, 1);
 		soldados.add(new Soldado("Beats", "Super Bass", 3, 5, 1));
-		soldados.get(3).setAtributos(2, 3, 4);
+		soldados.get(3).setAtributos(2, 3, 4, 1);
 		soldados.add(new Soldado("Steve", "Apple", 5, 4, 0));
-		soldados.get(4).setAtributos(2, 5, 2);
+		soldados.get(4).setAtributos(2, 5, 2, 1);
 		soldados.add(new Soldado("Bill", "Microsoft", 3, RolePlayingGame.MAX_X - 4, RolePlayingGame.MAX_Y - 1));
-		soldados.get(5).setAtributos(5, 1, 3);
+		soldados.get(5).setAtributos(5, 1, 3, 0);
            
 		
 		// Adiciona os personagens ao tabuleiro.
@@ -46,8 +48,12 @@ public class Controle {
 		Personagem p;
 		
 		for (Soldado s : soldados) {
+			
 			if(s.getNome().equals("Bill") || s.getNome().equals("Nokia") || s.getNome().equals("Linkedin")) {
 				rpg.info(String.format("Personagem %s, selecione sua nova posição!", s.getNome()));
+				
+			
+				
 				pos = rpg.selecionaPosicao();
 								
 				if (verificaPosicaoValida(pos, s)) {
@@ -57,32 +63,57 @@ public class Controle {
 					rpg.atualizaTabuleiro();
 
 					rpg.info(String.format("Personagem %s, selecione um inimigo para atacar!", s.getNome()));
+					
 					p = rpg.selecionaPersonagem();
+					
+					
+						
 					if (p != s) {
+						
+						if(p.getTipo() == s.getTipo()) {
+							rpg.erro("Você não pode atacar um aliado! Perdeu a vez."); 
+							rpg.atualizaTabuleiro();	
+						} else {
+						
 						//Arma de corpo a corpo - 100% de chance
-						if(Math.abs(p.getX() - s.getX()) == 1 || Math.abs(p.getY() - s.getY()) == 1)
-							p.setVida(p.getVida() - 1);
+						if(Math.abs(p.getX() - s.getX()) == 1 || Math.abs(p.getY() - s.getY()) == 1) {
+							p.setVida(p.getVida() - 1);}
 						//Arma à distância
-						else if(calculaProbabilidadeDeAtaque(s, p))
-							p.setVida(p.getVida() - 1);
+						else if(calculaProbabilidadeDeAtaque(s, p)) {
+							p.setVida(p.getVida() - 1);}
 						//Ataque de arma à distância falhou
-						else
-							rpg.erro("Nada aconteceu.");
+						else {
+							rpg.erro("Nada aconteceu.");}
 						
 						//Se o inimigo morrer, ele será removido
 						if(p.getVida() == 0) {
 							rpg.erro("Boom! " + p.getNome() + " morreu! Muahahahahaahah");
 							rpg.removePersonagem(p);
 							soldados.remove(p);
+							ini++;
 							rpg.atualizaTabuleiro();
+							
+							if(ini==3){
+								rpg.erro("Voce venceu!!!");
+								threadControle.interrupt();
+								
+							}
+							
 							break;
+							
+							//CONTADOR DE MORTES
+							
+							
+							
 						}
-					} else
+						}
+					} else {
 						rpg.erro("Você não pode atacar você mesmo! Perdeu a vez.");
-
+					}
 					rpg.atualizaTabuleiro();
-				} else
+				 }else {
 					rpg.erro("Posição inválida! Perdeu a vez.");
+			}
 			}
 		}
 	}

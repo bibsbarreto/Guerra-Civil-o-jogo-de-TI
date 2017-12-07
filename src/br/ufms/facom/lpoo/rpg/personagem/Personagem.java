@@ -4,13 +4,15 @@ import br.ufms.facom.lpoo.rpg.arma.Arma;
 
 public interface Personagem {
 
-	public void setAtributos(int defesa, int ataque, int velocidade);
+	public void setAtributos(int defesa, int ataque, int velocidade, int tipo);
 	
 	public int getDefesa();
 
 	public int getAtaque();
 
 	public int getVelocidade();
+	
+	public int getTipo();
 
 	public int getVida();
 

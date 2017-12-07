@@ -13,6 +13,7 @@ public class Soldado implements Personagem {
 	private int ataque;
 	private int defesa;
 	private int velocidade;
+	private int tipo; // 0 = Aliados / 1 = Inimigos;
 
 	public Soldado(String nome) {
 		this.nome = nome;
@@ -27,10 +28,11 @@ public class Soldado implements Personagem {
 	}
 
 	@Override
-	public void setAtributos(int ataque, int defesa, int velocidade) {
+	public void setAtributos(int ataque, int defesa, int velocidade, int tipo) {
 		this.defesa = defesa;
 		this.ataque = ataque;
 		this.velocidade = velocidade;
+		this.tipo = tipo;
 	}
 	
 	@Override
@@ -47,7 +49,7 @@ public class Soldado implements Personagem {
 	public int getVelocidade() {
 		return velocidade;
 	}
-
+	
 	@Override
 	public int getVida() {
 		return vida;
@@ -87,4 +89,9 @@ public class Soldado implements Personagem {
 	public void setVida(int vida) {
 		this.vida = vida;
 	}
+	
+	public int getTipo() {
+		return tipo;
+	}
+
 }

@@ -292,7 +292,7 @@ public class RolePlayingGame extends Application {
 					}
 				} catch (InterruptedException e) {
 				} finally {
-					System.out.println("Thread de controle interrompiada com sucesso!");
+					System.out.println("Thread de controle interrompida com sucesso!");
 				}
 			}
 		});
