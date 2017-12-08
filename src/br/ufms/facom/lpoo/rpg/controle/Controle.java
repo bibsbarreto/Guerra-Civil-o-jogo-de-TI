@@ -15,9 +15,8 @@ public class Controle {
 	private Thread threadControle;
 
 	//Array para valor da posição do inimigo 
-	private static int MIN = 1;
-	private static int MAX = 2;
-	int aux[] = {0, 1, -1};
+	private static int MIN = 2;
+	int aux[] = {-1, 1};
 	int d;
 	
 	private List<Soldado> soldados = new LinkedList<Soldado>();
@@ -28,7 +27,7 @@ public class Controle {
 
 		// Cria personagens em um canto do tabuleiro e outro em outro canto.
 		soldados.add(new Soldado("Nokia", "Tijolão", 5, RolePlayingGame.MAX_X - 5, RolePlayingGame.MAX_Y - 2));
-		soldados.get(0).setAtributos(4, 5, 0, 0);
+		soldados.get(0).setAtributos(4, 4, 1, 0);
 		soldados.add(new Soldado("Siri", "Siri Robótico", 2, 3, 1));
 		soldados.get(1).setAtributos(3, 1, 5, 1);
 		soldados.add(new Soldado("Linkedin", "Currículo", 2, RolePlayingGame.MAX_X - 3, RolePlayingGame.MAX_Y - 2));
@@ -38,7 +37,7 @@ public class Controle {
 		soldados.add(new Soldado("Bill", "Microsoft", 3, RolePlayingGame.MAX_X - 4, RolePlayingGame.MAX_Y - 1));
 		soldados.get(4).setAtributos(5, 1, 3, 0);
 		soldados.add(new Soldado("Steve", "Apple", 5, 4, 0));
-		soldados.get(5).setAtributos(2, 5, 2, 1);
+		soldados.get(5).setAtributos(3, 4, 2, 1);
            
 		
 		// Adiciona os personagens ao tabuleiro.
@@ -52,7 +51,7 @@ public class Controle {
 
 
 	public void executaTurno() throws InterruptedException {	
-		Posicao pos;
+		Posicao pos = new Posicao();
 		Personagem p;
 		
 		//Variável auxiliar para analisar os aliados
@@ -61,7 +60,12 @@ public class Controle {
 		int dist[] = new int[3];
 		
 		for (Soldado s : soldados) {	
-			//Vez dos aliados
+			/*
+			*	
+			*
+			*
+			*
+			Vez dos aliados */
 			if(s.getTipo() == 0) {
 				rpg.info(String.format("Personagem %s, selecione sua nova posição!", s.getNome()));
 				
@@ -88,13 +92,18 @@ public class Controle {
 						
 						//Arma de corpo a corpo - 100% de chance
 						if(Math.abs(p.getX() - s.getX()) == 1 || Math.abs(p.getY() - s.getY()) == 1) {
-							p.setVida(p.getVida() - 1);}
+							p.setVida(p.getVida() - 1);
+							rpg.erro(p.getNome() + ": Aii man!");
+						}
 						//Arma à distância
 						else if(calculaProbabilidadeDeAtaque(s, p)) {
-							p.setVida(p.getVida() - 1);}
+							p.setVida(p.getVida() - 1);
+							rpg.erro(p.getNome() + ": Essa doeu!");
+						}
 						//Ataque de arma à distância falhou
 						else {
-							rpg.erro("Nada aconteceu.");}
+							rpg.erro("Nada aconteceu.");
+						}
 						
 						//Se o inimigo morrer, ele será removido
 						if(p.getVida() == 0) {
@@ -120,8 +129,12 @@ public class Controle {
 					rpg.erro("Posição inválida! Perdeu a vez.");
 				 }
 			
-				
-			//Vez dos inimigos
+			/*
+			*	
+			*
+			*
+			*
+			Vez dos inimigos */
 			} else {
 				rpg.info(String.format("Vez do %s!", s.getNome()));
 				rpg.atualizaTabuleiro();
@@ -132,35 +145,47 @@ public class Controle {
 					//Pegar aliado com menor distância
 					if(a.getTipo() == 0) {
 						dist[i] = Math.abs(a.getX() - s.getX()) + Math.abs(a.getY() - s.getY());
-						if(i >0) {
+						if(i > 0 && i < 4) {
 							if(dist[i] < dist[i-1]) {
 								sAux = a;
 							}
 						} else {
 							sAux = a;
 						}
-					}		
+						i++;
+					}	
+					
 				}
 				
 				//Inimigo mover para perto do aliado
 				Random rand = new Random();
-				d = rand.nextInt(s.getVelocidade());
-				//d = Math.abs(sAux.getX() - s.getX()) + Math.abs(sAux.getY() - s.getY());
-				s.setX(rand.nextInt(d));
-				System.out.println(rand.nextInt((int)((Math.random()*MAX)+MIN)));
-				s.setY(aux[rand.nextInt((int)((Math.random()*MAX)+MIN))]*(d + sAux.getX() - s.getX()));
+				 do{
+					 d = rand.nextInt(s.getVelocidade()) + 1;
+					 pos.x = rand.nextInt(d) + 1;
+					 System.out.println(pos.x);
+					 pos.y = sAux.getY() + aux[rand.nextInt(MIN)]*(d + sAux.getX() - s.getX());
+					 
+				} while(verificaPosicaoValida(pos, s) == false);
+
+				s.setX(pos.x);
+				s.setY(pos.y);
 				
 				//Arma de corpo a corpo - 100% de chance
 				if(Math.abs(sAux.getX() - s.getX()) == 1 || Math.abs(sAux.getY() - s.getY()) == 1) {
-					sAux.setVida(sAux.getVida() - 1);}
+					sAux.setVida(sAux.getVida() - 1);
+					rpg.erro(sAux.getNome() + ": Aii man!");
+				}
 				//Arma à distância
 				else if(calculaProbabilidadeDeAtaque(s, sAux)) {
-					sAux.setVida(sAux.getVida() - 1);}
+					sAux.setVida(sAux.getVida() - 1);
+					rpg.erro(sAux.getNome() + ": Essa doeu!");
+				}
 				//Ataque de arma à distância falhou
 				else {
-					rpg.erro("Nada aconteceu.");}
+					rpg.erro("Nada aconteceu.");
+				}
 						
-				//Se o inimigo morrer, ele será removido
+				//Se o aliado morrer, ele será removido
 				if(sAux.getVida() == 0) {
 					rpg.erro("Boom! " + sAux.getNome() + " morreu! Muahahahahaahah");
 					rpg.removePersonagem(sAux);
@@ -184,13 +209,20 @@ public class Controle {
 	public boolean verificaPosicaoValida(Posicao pos, Personagem p) {
 		boolean valido = true;
 
+		//Validar se a distância de Manhatan é menor ou igual à velocidade do personagem
 		if(Math.abs(p.getX() - pos.x) + Math.abs(p.getY() - pos.y) > p.getVelocidade()) {
 			valido = false;
 		}
 		
+		//Validar se a posição não está ocupada
 		for (Soldado s : soldados) {
 			if(s.getX() == pos.x && s.getY() == pos.y)
 				valido = false;
+		}
+		
+		//Validar se a posição não está fora da tela
+		if(pos.x > RolePlayingGame.MAX_X || pos.y > RolePlayingGame.MAX_Y || pos.x < 0 || pos.y < 0) {
+			return false;
 		}
 		return valido;
 	}
